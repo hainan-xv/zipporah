@@ -16,7 +16,9 @@ if [ "$aligner" == "fast-align" ]; then
 
   if [ "$align_job" == "" ]; then
     echo align with 1 job
-    $moses/tools/fast_align -i $tmpfolder/pasted -d -o -v > $alignoutput
+    $moses/tools/fast_align -i $tmpfolder/pasted -d -o -v > $alignoutput.forward
+    $moses/tools/fast_align -i $tmpfolder/pasted -d -o -v -r > $alignoutput.backward
+    $moses/tools/atools -i $alignoutput.forward -j $alignoutput.backward -c grow-diag-final-and > $alignoutput
   else
 #    shuf $tmpfolder/pasted > $tmpfolder/pasted.shuffed
     echo align with $align_job job

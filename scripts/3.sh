@@ -43,8 +43,8 @@ for data in bad dev; do
   $ROOT/scripts/queue.pl JOB=1:$translation_num_jobs $tmpfolder/compute-kl.f2e.JOB.log $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.in.JOB $tmpfolder/s.out.JOB $f2e $tmpfolder/out.f2e.JOB 
   $ROOT/scripts/queue.pl JOB=1:$translation_num_jobs $tmpfolder/compute-kl.e2f.JOB.log $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.out.JOB $tmpfolder/s.in.JOB $e2f $tmpfolder/out.e2f.JOB
 
-  touch $base/translation.bow.$input_lang-$output_lang $base/translation.bow.$output_lang-$input_lang
-  rm    $base/translation.bow.$input_lang-$output_lang $base/translation.bow.$output_lang-$input_lang
+  touch $base/translation.$input_lang-$output_lang $base/translation.$output_lang-$input_lang
+  rm    $base/translation.$input_lang-$output_lang $base/translation.$output_lang-$input_lang
 
   for i in `seq 1 $[$translation_num_jobs]`; do
     cat $tmpfolder/out.f2e.$i >> $base/translation.$input_lang-$output_lang

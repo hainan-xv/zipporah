@@ -7,8 +7,9 @@
 
 using namespace std;
 
-int min_count = 1;
-int min_total_count = 1;
+int min_count = 5;
+int min_total_count = 100;
+const string NULL_STR = "<NULL>";
 
 void Output(map<string, map<string, double> > d, ofstream& ofile) {
   for (map<string, map<string, double> >::iterator iter = d.begin();
@@ -94,8 +95,8 @@ void Normalize(map<string, map<string, double> >& d) {
 int main(int argc, char **argv) {
   int i = 1;
 
-  if (argc != 7) {
-    cout << argv[0] << "min_count en_file fr_file align_file out_dict1 out_dict2" << endl;
+  if (argc != 8) {
+    cout << argv[0] << " min_count min-total-count en_file fr_file align_file out_dict1 out_dict2" << endl;
     return -1;
   }
 
@@ -103,6 +104,11 @@ int main(int argc, char **argv) {
   {
     stringstream ss(min_count_str);
     ss >> min_count;
+  }
+  string min_tot_count_str = argv[i++];
+  {
+    stringstream ss(min_tot_count_str);
+    ss >> min_total_count;
   }
 
   string en_file = argv[i++];
@@ -133,11 +139,17 @@ int main(int argc, char **argv) {
     vector<string> en_words = Split(en_line);
     vector<string> fr_words = Split(fr_line);
     vector<string> align_words = Split(align_line);
+
+    vector<int> en_appear(en_words.size(), false);
+    vector<int> fr_appear(fr_words.size(), false);
     
     for (int i = 0; i < align_words.size(); i++) {
       string aligned_pair = align_words[i];
       int a, b;
       PairToIndex(aligned_pair, &a, &b);
+      en_appear[a] = true;
+      fr_appear[b] = true;
+
       string en_word = en_words[a];
       string fr_word = fr_words[b];
 
@@ -160,6 +172,60 @@ int main(int argc, char **argv) {
           fr_to_en_dict[fr_word] = m;
         } else {
           iter->second[en_word] ++;
+        }
+      }
+    }
+    
+    for (int i = 0; i < en_appear.size(); i++) {
+      if (!en_appear[i]) {
+        string en_word = en_words[i];
+        string fr_word = NULL_STR;
+        {
+          auto iter = en_to_fr_dict.find(en_word);
+          if (iter == en_to_fr_dict.end()) {
+            map<string, double> m;
+            m[fr_word] = 1;
+            en_to_fr_dict[en_word] = m;
+          } else {
+            iter->second[fr_word] ++;
+          }
+        }
+        {
+          auto iter = fr_to_en_dict.find(fr_word);
+          if (iter == fr_to_en_dict.end()) {
+            map<string, double> m;
+            m[en_word] = 1;
+            fr_to_en_dict[fr_word] = m;
+          } else {
+            iter->second[en_word] ++;
+          }
+        }
+      }
+    }
+
+    for (int i = 0; i < fr_appear.size(); i++) {
+      if (!fr_appear[i]) {
+        string en_word = NULL_STR;
+        string fr_word = fr_words[i];
+        {
+          auto iter = en_to_fr_dict.find(en_word);
+          if (iter == en_to_fr_dict.end()) {
+            map<string, double> m;
+            m[fr_word] = 1;
+            en_to_fr_dict[en_word] = m;
+          } else {
+            iter->second[fr_word] ++;
+          }
+        }
+        {
+          auto iter = fr_to_en_dict.find(fr_word);
+          if (iter == fr_to_en_dict.end()) {
+            map<string, double> m;
+            m[en_word] = 1;
+            fr_to_en_dict[fr_word] = m;
+          } else {
+            iter->second[en_word] ++;
+          }
         }
       }
     }

@@ -9,8 +9,10 @@
 #include <math.h>
 
 double KL_CONST = 0.000001;
-double CONST_2 = 0.0;
+double CONST_2 = 1.0;
 using namespace std;
+
+const string NULL_STR = "<NULL>";
 
 string ToUpper(string input) {
   string res = input;
@@ -30,6 +32,7 @@ vector<string> Split(string input) {
   while (ss >> word) {
     ans.push_back(word);
   }
+  ans.push_back(NULL_STR);
   return ans;
 }
 
@@ -112,7 +115,7 @@ void DoTranslate(const unordered_map<string, double> &table,
     map<string, double>::iterator q_iter = q.begin(), p_iter = p.begin();
     for (; q_iter != q.end(); ) {
       assert(p_iter->first == q_iter->first);
-//      cout << "for word " << q_iter->first << " adding " << p_iter->second << " * " <<  log(p_iter->second / q_iter->second) << " = " << p_iter->second * log(p_iter->second / q_iter->second) << endl;
+      cout << "for word " << q_iter->first << " adding " << p_iter->second << " * " <<  log(p_iter->second / q_iter->second) << " = " << p_iter->second * log(p_iter->second / q_iter->second) << endl;
       ans += p_iter->second * pow(log(1.0 / q_iter->second), CONST_2);
 //      ans += p_iter->second * log(p_iter->second / q_iter->second);
       q_iter++;
@@ -125,7 +128,7 @@ void DoTranslate(const unordered_map<string, double> &table,
 
 int main(int argc, char** argv) {
   if (argc < 4 && argc > 6) {
-    cerr << argv[0] << " table-file src-file tgt-file [kl-const] " << endl
+    cout << argv[0] << " table-file src-file tgt-file [kl-const] " << endl
          << endl
          << argv[0] << " requires 4 parameters; got instead " << argc << endl;
     return -1;
@@ -135,11 +138,11 @@ int main(int argc, char** argv) {
   string src_file = argv[2];
   string tgt_file = argv[3];
 
-  if (argc == 5) {
+  if (argc >= 5) {
     KL_CONST = ToDouble(string(argv[4]));
   }
 
-  if (argc == 6) {
+  if (argc >= 6) {
     CONST_2 = ToDouble(string(argv[5]));
   }
 
