@@ -13,6 +13,7 @@ double CONST_2 = 1.0;
 using namespace std;
 
 const string NULL_STR = "<NULL>";
+//const string NULL_STR = "";
 
 string ToUpper(string input) {
   string res = input;
@@ -76,7 +77,8 @@ void DoTranslate(const unordered_map<string, double> &table,
     int size = words.size();
     int size2 = words2.size();
     for (int i = 0; i < size2; i++) {
-      p[words2[i]] += 1.0 / size2;
+      p[words2[i]] += 1.0;
+//      p[words2[i]] += 1.0 / size2;
       q[words2[i]] = KL_CONST;
     }
 
@@ -85,11 +87,13 @@ void DoTranslate(const unordered_map<string, double> &table,
         if (table.find(words[i]) != table.end()) {
           auto iter = table.find(words[i] + " " + j->first);
           if (iter != table.end()) {
-            q[j->first] += 1.0 / size * iter->second;
+            q[j->first] += 1.0 / 1.0 * iter->second;
+//            q[j->first] += 1.0 / size * iter->second;
           }
         } else {
           if (words[i] == j->first) {
-            q[j->first] += 1.0 / size;
+            q[j->first] += 1.0 / 1.0;
+//            q[j->first] += 1.0 / size;
           }
         }
       }
@@ -115,13 +119,13 @@ void DoTranslate(const unordered_map<string, double> &table,
     map<string, double>::iterator q_iter = q.begin(), p_iter = p.begin();
     for (; q_iter != q.end(); ) {
       assert(p_iter->first == q_iter->first);
-      cout << "for word " << q_iter->first << " adding " << p_iter->second << " * " <<  log(p_iter->second / q_iter->second) << " = " << p_iter->second * log(p_iter->second / q_iter->second) << endl;
+//      cout << "for word " << q_iter->first << " adding " << p_iter->second << " * " <<  log(p_iter->second / q_iter->second) << " = " << p_iter->second * log(p_iter->second / q_iter->second) << endl;
       ans += p_iter->second * pow(log(1.0 / q_iter->second), CONST_2);
 //      ans += p_iter->second * log(p_iter->second / q_iter->second);
       q_iter++;
       p_iter++;
     }
-    cout << ans << endl;
+    cout << ans / (size) << endl;
 
   }
 }
