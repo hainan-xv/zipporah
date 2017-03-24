@@ -8,12 +8,9 @@
 #include <assert.h>
 #include <math.h>
 
-double KL_CONST = 0.000001;
+double KL_CONST = 0.0001;
 double CONST_2 = 1.0;
 using namespace std;
-
-const string NULL_STR = "<NULL>";
-//const string NULL_STR = "";
 
 string ToUpper(string input) {
   string res = input;
@@ -33,7 +30,6 @@ vector<string> Split(string input) {
   while (ss >> word) {
     ans.push_back(word);
   }
-  ans.push_back(NULL_STR);
   return ans;
 }
 
@@ -53,9 +49,10 @@ unordered_map<string, double> GetTable(istream &input) {
     string key = words[0];
     string value = words[1];
     double prob = ToDouble(words[2]);
+    double tot = ToDouble(words[3]);
 
     ans[key + " " + value] = prob;
-    ans[key] = 1.0; // meaning we have this word in the vocab
+    ans[key] = tot; // meaning we have this word in the vocab
   }
 
   return ans;
@@ -74,12 +71,26 @@ void DoTranslate(const unordered_map<string, double> &table,
     map<string, double> p;  // reference vector
     map<string, double> q;  // translated vector
 
+    map<string, double> small_table;
+
     int size = words.size();
     int size2 = words2.size();
+
+    double total_weight_src = 0.0;
+
     for (int i = 0; i < size2; i++) {
-      p[words2[i]] += 1.0;
-//      p[words2[i]] += 1.0 / size2;
+      p[words2[i]] += 1.0 / size2;
       q[words2[i]] = KL_CONST;
+    }
+
+    for (int i = 0; i < size; i++) {
+      double weight = 1.0;
+      auto iter = table.find(words[i]);
+      if (iter != table.end()) {
+        weight= iter->second;
+      }
+      small_table[words[i]] = weight;
+      total_weight_src += weight;
     }
 
     for (int i = 0; i < size; i++) {
@@ -87,45 +98,29 @@ void DoTranslate(const unordered_map<string, double> &table,
         if (table.find(words[i]) != table.end()) {
           auto iter = table.find(words[i] + " " + j->first);
           if (iter != table.end()) {
-            q[j->first] += 1.0 / 1.0 * iter->second;
-//            q[j->first] += 1.0 / size * iter->second;
+            q[j->first] += small_table[words[i]] / total_weight_src * iter->second;
           }
         } else {
           if (words[i] == j->first) {
-            q[j->first] += 1.0 / 1.0;
-//            q[j->first] += 1.0 / size;
+            q[j->first] += 1.0 / total_weight_src;
           }
         }
       }
     }
-
-//    for (int i = 0; i < size; i++) {
-//      for (int j = 0; j < size2; j++) {
-//        if (table.find(words[i]) != table.end()) {
-//          auto iter = table.find(words[i] + " " + words2[j]);
-//          if (iter != table.end()) {
-//            q[words2[j]] += 1.0 / size * iter->second;
-//          }
-//        } else {
-//          if (words[i] == words2[j]) {
-//            q[words2[j]] += 1.0 / size;
-//            break;
-//          }
-//        }
-//      }
-//    }
 
     double ans = 0.0;
     map<string, double>::iterator q_iter = q.begin(), p_iter = p.begin();
     for (; q_iter != q.end(); ) {
       assert(p_iter->first == q_iter->first);
 //      cout << "for word " << q_iter->first << " adding " << p_iter->second << " * " <<  log(p_iter->second / q_iter->second) << " = " << p_iter->second * log(p_iter->second / q_iter->second) << endl;
-      ans += p_iter->second * pow(log(1.0 / q_iter->second), CONST_2);
+      ans += p_iter->second * log(1.0 / q_iter->second);
+//      ans += p_iter->second * log(p_iter->second / q_iter->second);
+//      ans += p_iter->second * pow(log(1.0 / q_iter->second), CONST_2);
 //      ans += p_iter->second * log(p_iter->second / q_iter->second);
       q_iter++;
       p_iter++;
     }
-    cout << ans / (size) << endl;
+    cout << ans << endl;
 
   }
 }

@@ -12,9 +12,9 @@ mkdir -p $tmpfolder
 . $config
 
 if [ "$aligner" == "fast-align" ]; then
-  paste $corpusfr $corpusen | sed "s=\t= ||| =g" > $tmpfolder/pasted
+  paste $corpusfr $corpusen | awk -F '\t' '{print $1," ||| ",$2}' > $tmpfolder/pasted
 
-  if [ "$align_job" == "" ]; then
+  if [ "$align_job" == "" ] || [ "$align_job" == "1" ]; then
     echo align with 1 job
     $moses/tools/fast_align -i $tmpfolder/pasted -d -o -v > $alignoutput.forward
     $moses/tools/fast_align -i $tmpfolder/pasted -d -o -v -r > $alignoutput.backward

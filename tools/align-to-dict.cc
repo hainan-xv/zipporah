@@ -4,23 +4,13 @@
 #include <map>
 #include <sstream>
 #include <math.h> 
+#include <assert.h>
+
 
 using namespace std;
 
 int min_count = 5;
 int min_total_count = 100;
-const string NULL_STR = "<NULL>";
-
-void Output(map<string, map<string, double> > d, ofstream& ofile) {
-  for (map<string, map<string, double> >::iterator iter = d.begin();
-                                                   iter != d.end(); iter++) {
-    for (map<string, double>::iterator iter2 = iter->second.begin();
-                                       iter2 != iter->second.end();
-                                       iter2++) {
-      ofile << iter->first << " " << iter2->first << " " << iter2->second << endl;
-    }
-  }
-}
 
 vector<string> Split(string input) {
   vector<string> ans;
@@ -56,38 +46,58 @@ void PairToIndex(string str, int *a, int *b) {
 
 }
 
-void Normalize(map<string, double> &d) {
-  double normalizer = 0.0;
-  for (map<string, double>::iterator iter = d.begin(); iter != d.end();) {
-    if (iter->second < min_count) {
-      d.erase(iter++);
+//int Normalize(map<string, double> &d, double normalizer) {
+//  // returns the sum of numerator
+//  int sum = 0;
+//  normalizer = sqrt(normalizer);
+//
+//  if (normalizer < min_total_count) {
+//    d.clear();
+//    return 0;
+//  }
+//
+//  for (map<string, double>::iterator iter = d.begin(); iter != d.end(); iter++) {
+//    sum += iter->second;
+//    iter->second /= normalizer;
+//  }
+//
+//  return sum;
+//}
+//
+//void Normalize(map<string, map<string, double> >& d, map<string, double> &counts) {
+//  for (map<string, map<string, double> >::iterator iter = d.begin();
+//                                                   iter != d.end();) {
+//    double count = 0;
+//    auto iter2 = counts.find(iter->first);
+//    assert(iter2 != counts.end());
+//    count = iter2->second;
+//    iter2->second = Normalize(iter->second, count);
+//    if (iter->second.size() == 0) {
+//      d.erase(iter++);
+//    } else {
+//      iter++;
+//    }
+//  }
+//}
+
+void Output(map<string, map<string, double> > &d,
+            map<string, double> &w_c,
+            map<string, double> &a_c,
+            ofstream& ofile) {
+  for (map<string, map<string, double> >::iterator iter = d.begin();
+                                                   iter != d.end(); iter++) {
+    double word_count = w_c[iter->first];
+
+    if (word_count < min_total_count) {
       continue;
     }
-    normalizer += iter->second;
-//    normalizer += iter->second * iter->second;
-    iter++;
-  }
-
-//  normalizer = sqrt(normalizer);
-
-  if (normalizer < min_total_count) {
-    d.clear();
-    return;
-  }
-
-  for (map<string, double>::iterator iter = d.begin(); iter != d.end(); iter++) {
-    iter->second /= normalizer;
-  }
-}
-
-void Normalize(map<string, map<string, double> >& d) {
-  for (map<string, map<string, double> >::iterator iter = d.begin();
-                                                   iter != d.end();) {
-    Normalize(iter->second);
-    if (iter->second.size() == 0) {
-      d.erase(iter++);
-    } else {
-      iter++;
+    double align_count = a_c[iter->first];
+    for (map<string, double>::iterator iter2 = iter->second.begin();
+                                       iter2 != iter->second.end();
+                                       iter2++) {
+      ofile << iter->first << " " << iter2->first << " "
+            << iter2->second / word_count << " "
+            << align_count * 1.0 / word_count << endl;
     }
   }
 }
@@ -124,6 +134,12 @@ int main(int argc, char **argv) {
   map<string, map<string, double> > en_to_fr_dict;
   map<string, map<string, double> > fr_to_en_dict;
 
+  map<string, double> en_word_counts;
+  map<string, double> fr_word_counts;
+
+  map<string, double> en_align_counts;
+  map<string, double> fr_align_counts;
+
   string en_line, fr_line, align_line;
   
   int cur_line = 0;
@@ -140,18 +156,24 @@ int main(int argc, char **argv) {
     vector<string> fr_words = Split(fr_line);
     vector<string> align_words = Split(align_line);
 
-    vector<int> en_appear(en_words.size(), false);
-    vector<int> fr_appear(fr_words.size(), false);
+    for (int i = 0; i < en_words.size(); i++) {
+      en_word_counts[en_words[i]] ++;
+    }
+
+    for (int i = 0; i < fr_words.size(); i++) {
+      fr_word_counts[fr_words[i]] ++;
+    }
     
     for (int i = 0; i < align_words.size(); i++) {
       string aligned_pair = align_words[i];
       int a, b;
       PairToIndex(aligned_pair, &a, &b);
-      en_appear[a] = true;
-      fr_appear[b] = true;
 
       string en_word = en_words[a];
       string fr_word = fr_words[b];
+
+      en_align_counts[en_word] ++;
+      fr_align_counts[fr_word] ++;
 
       map<string, map<string, double> >::iterator iter;
       {
@@ -164,6 +186,7 @@ int main(int argc, char **argv) {
           iter->second[fr_word] ++;
         }
       }
+
       {
         iter = fr_to_en_dict.find(fr_word);
         if (iter == fr_to_en_dict.end()) {
@@ -175,63 +198,10 @@ int main(int argc, char **argv) {
         }
       }
     }
-    
-    for (int i = 0; i < en_appear.size(); i++) {
-      if (!en_appear[i]) {
-        string en_word = en_words[i];
-        string fr_word = NULL_STR;
-        {
-          auto iter = en_to_fr_dict.find(en_word);
-          if (iter == en_to_fr_dict.end()) {
-            map<string, double> m;
-            m[fr_word] = 1;
-            en_to_fr_dict[en_word] = m;
-          } else {
-            iter->second[fr_word] ++;
-          }
-        }
-        {
-          auto iter = fr_to_en_dict.find(fr_word);
-          if (iter == fr_to_en_dict.end()) {
-            map<string, double> m;
-            m[en_word] = 1;
-            fr_to_en_dict[fr_word] = m;
-          } else {
-            iter->second[en_word] ++;
-          }
-        }
-      }
-    }
-
-    for (int i = 0; i < fr_appear.size(); i++) {
-      if (!fr_appear[i]) {
-        string en_word = NULL_STR;
-        string fr_word = fr_words[i];
-        {
-          auto iter = en_to_fr_dict.find(en_word);
-          if (iter == en_to_fr_dict.end()) {
-            map<string, double> m;
-            m[fr_word] = 1;
-            en_to_fr_dict[en_word] = m;
-          } else {
-            iter->second[fr_word] ++;
-          }
-        }
-        {
-          auto iter = fr_to_en_dict.find(fr_word);
-          if (iter == fr_to_en_dict.end()) {
-            map<string, double> m;
-            m[en_word] = 1;
-            fr_to_en_dict[fr_word] = m;
-          } else {
-            iter->second[en_word] ++;
-          }
-        }
-      }
-    }
   }
-  Normalize(en_to_fr_dict);
-  Normalize(fr_to_en_dict);
+
+//  Normalize(en_to_fr_dict, en_word_counts);
+//  Normalize(fr_to_en_dict, fr_word_counts);
 
   en.close();
   fr.close();
@@ -240,10 +210,7 @@ int main(int argc, char **argv) {
   ofstream ofile1(out_dict_1.c_str());
   ofstream ofile2(out_dict_2.c_str());
 
-  Output(en_to_fr_dict, ofile1);
-  Output(fr_to_en_dict, ofile2);
-
-
-
+  Output(en_to_fr_dict, en_word_counts, en_align_counts, ofile1);
+  Output(fr_to_en_dict, fr_word_counts, fr_align_counts, ofile2);
 
 }
