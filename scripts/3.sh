@@ -55,9 +55,10 @@ for data in bad dev; do
 
   for lang in $input_lang $output_lang; do
   (    vocab=$modeldir/ngram/vocab.$lang
+    map_unk=`tail -n 1 $vocab`
     [ ! -f $test.s.$lang ] && ( cat $test.$lang | awk '{printf("<s> %s </s>\n", $0)}' > $test.s.$lang )
 
-    $srilm/ngram -lm $modeldir/lm.$lang -order $ngram_order -ppl $test.s.$lang -debug 1 2>&1 \
+    $srilm/ngram -map-unk $map_unk -lm $modeldir/lm.$lang -order $ngram_order -ppl $test.s.$lang -debug 1 2>&1 \
       | tee $base/ngram.raw.$lang | egrep "(logprob.*ppl.*ppl1=)|( too many words per sentence)" | head -n -1 | awk '{print log($6)}' > $base/ngram.$lang
     cat $base/ngram.raw.$lang | grep "sentences.*words.*OOVs" | head -n -1 | awk '{print $5/$3}' > $base/oov-rate.$lang
   ) &

@@ -23,10 +23,11 @@ set -v
 #tmpdir=$working/$id/step-1/corpus/raw-to-clean
 mkdir -p $tmpdir
 
-$moses/scripts/tokenizer/tokenizer.perl -l $lang \
-    -threads 16                                          \
-    < $raw                                               \
-    > $clean
+#cat $raw | sed "s=????==g" | sed "s=???==g" | sed "s=??==g" | \
+#    $moses/scripts/tokenizer/tokenizer.perl -l $lang -no-escape -threads 16 > $clean
+
+cat $raw | sed "s=????==g" | sed "s=???==g" | sed "s=??==g" | \
+    $moses/scripts/tokenizer/tokenizer.perl -l $lang -threads 16 > $clean
 
 #$moses/scripts/tokenizer/tokenizer.perl -l $lang \
 #    -threads 16                                          \

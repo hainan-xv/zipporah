@@ -19,8 +19,8 @@ mkdir -p $base/corpus
 echo "[step-1] processing good corpus"
 if [ -f $clean_stem_good.$input_lang ] && [ -f $clean_stem_good.$output_lang ]; then
   check_equal_lines $clean_stem_good.$input_lang $clean_stem_good.$output_lang
-  ln -s $clean_stem_good.$input_lang  $base/corpus/good.clean.$input_lang
-  ln -s $clean_stem_good.$output_lang $base/corpus/good.clean.$output_lang
+  ln -s $clean_stem_good.$input_lang  $base/corpus/good.clean.$input_lang 2>/dev/null
+  ln -s $clean_stem_good.$output_lang $base/corpus/good.clean.$output_lang 2>/dev/null
 else
   check_equal_lines $raw_stem_good.$input_lang $raw_stem_good.$output_lang
   for i in $input_lang $output_lang; do
@@ -63,11 +63,13 @@ echo "[step-1] test dictionary on dev data"
 
 cat $base/corpus/dev.clean.$output_lang | ./scripts/shuf.sh > $base/corpus/dev.clean.shuf.$output_lang
 
-../zipporah/tools/generate-bow-scores $base/model/dict.$output_lang-$input_lang $base/corpus/dev.clean.$output_lang $base/corpus/dev.clean.$input_lang > $base/logs/xent.good.$output_lang-$input_lang
-../zipporah/tools/generate-bow-scores $base/model/dict.$input_lang-$output_lang $base/corpus/dev.clean.$input_lang $base/corpus/dev.clean.$output_lang > $base/logs/xent.good.$input_lang-$output_lang
+../zipporah/tools/generate-bow-scores $base/model/dict.$output_lang-$input_lang $base/corpus/dev.clean.$output_lang $base/corpus/dev.clean.$input_lang > $base/logs/xent.good.$output_lang-$input_lang &
+../zipporah/tools/generate-bow-scores $base/model/dict.$input_lang-$output_lang $base/corpus/dev.clean.$input_lang $base/corpus/dev.clean.$output_lang > $base/logs/xent.good.$input_lang-$output_lang &
 
-../zipporah/tools/generate-bow-scores $base/model/dict.$output_lang-$input_lang $base/corpus/dev.clean.shuf.$output_lang $base/corpus/dev.clean.$input_lang > $base/logs/xent.bad.$output_lang-$input_lang
+../zipporah/tools/generate-bow-scores $base/model/dict.$output_lang-$input_lang $base/corpus/dev.clean.shuf.$output_lang $base/corpus/dev.clean.$input_lang > $base/logs/xent.bad.$output_lang-$input_lang &
 ../zipporah/tools/generate-bow-scores $base/model/dict.$input_lang-$output_lang $base/corpus/dev.clean.$input_lang $base/corpus/dev.clean.shuf.$output_lang > $base/logs/xent.bad.$input_lang-$output_lang
+
+wait
 
 
 paste $base/logs/xent.good.* | awk '{print $1+$2}' > $base/logs/xent.good
@@ -79,8 +81,6 @@ cat $base/logs/xent.{good,bad} | awk '{print NR,$0}' > $base/logs/xent.both
 
 cat $base/logs/xent.both | sort -k2 -g | head -n $n | sort -k1n | grep -n "$n " | sed "s=:= =g" | awk '{print "the quality of the dictionary is", $1 / $2, " out of 1.0"}'
 
-exit
-
 echo "[step-1] train ngram on good data"
 mkdir -p $base/model/ngram
 
@@ -89,7 +89,8 @@ for lang in $input_lang $output_lang; do
   vocab=$base/model/ngram/vocab.$lang
   cat $train.$lang | awk '{for(i=1;i<=NF;i++)print$i}' | sort | uniq -c | sort -n -k1 -r | head -n $word_count | awk '{print$2}' > $vocab
   echo Training LM for $lang
-  $srilm/ngram-count -order $ngram_order -vocab $vocab -text $train.$lang -lm $base/model/lm.$lang -kndiscount
+#  $srilm/ngram-count -order $ngram_order -vocab $vocab -text $train.$lang -lm $base/model/lm.$lang -kndiscount
+  $srilm/ngram-count -order $ngram_order -vocab $vocab -text $train.$lang -lm $base/model/lm.$lang
 
 done
 

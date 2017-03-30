@@ -32,6 +32,8 @@ else
   done
 fi 
 
+ln -s $working/$id/step-1/corpus/dev.clean.$input_lang $base/corpus
+ln -s $working/$id/step-1/corpus/dev.clean.$output_lang $base/corpus
 
 touch $working/$id/.done.2
 echo "[step-2] finished."
