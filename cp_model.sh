@@ -22,3 +22,5 @@ mkdir $to
 cd $to/
 
 ln -s ../$from/step-1
+ln -s ../$from/step-2
+ln -s ../$from/step-3

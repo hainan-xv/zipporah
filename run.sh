@@ -39,6 +39,6 @@ echo "id=$id" > $working/$id/config
 echo "iter=$i" >> $working/$id/config
 cat $config >> $working/$id/config
 
-for j in `seq 1 5`; do
+for j in `seq 1 4`; do
   [ $stage -le $j ] && $ROOT/scripts/$j.sh $working/$id/config
 done
