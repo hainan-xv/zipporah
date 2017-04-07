@@ -30,4 +30,6 @@ $data_file $n
 EOF
 
 #echo $clust/clust $num_gauss $savefolder/infofile $out_param full
+#$clust/clust $num_gauss $savefolder/infofile $out_param full
+#$clust/clust 1 $savefolder/infofile $out_param full $num_gauss
 $clust/clust $num_gauss $savefolder/infofile $out_param full

@@ -16,6 +16,7 @@ mkdir -p $base/logs
 
 mkdir -p $base/corpus
 
+true && (
 echo "[step-1] processing good corpus"
 if [ -f $clean_stem_good.$input_lang ] && [ -f $clean_stem_good.$output_lang ]; then
   check_equal_lines $clean_stem_good.$input_lang $clean_stem_good.$output_lang
@@ -91,8 +92,51 @@ for lang in $input_lang $output_lang; do
   echo Training LM for $lang
 #  $srilm/ngram-count -order $ngram_order -vocab $vocab -text $train.$lang -lm $base/model/lm.$lang -kndiscount
   $srilm/ngram-count -order $ngram_order -vocab $vocab -text $train.$lang -lm $base/model/lm.$lang
-
 done
+)
+
+echo "[step-1] test lm on dev data"
+modeldir=$working/$id/step-1/model 
+
+cat $base/corpus/dev.clean.$input_lang | python ./scripts/shuffle-within-lines.py > $base/corpus/dev.clean.shufwords.$input_lang
+cat $base/corpus/dev.clean.$output_lang | python ./scripts/shuffle-within-lines.py > $base/corpus/dev.clean.shufwords.$output_lang
+cat $base/corpus/dev.clean.shufwords.$output_lang | ./scripts/shuf.sh > $base/corpus/dev.clean.shufboth.$output_lang
+
+cat $base/corpus/dev.clean.$input_lang > $base/corpus/bad.dev.clean.$input_lang
+cat $base/corpus/dev.clean.shuf.$output_lang > $base/corpus/bad.dev.clean.$output_lang
+
+cat $base/corpus/dev.clean.shufwords.$input_lang >> $base/corpus/bad.dev.clean.$input_lang
+cat $base/corpus/dev.clean.shufwords.$output_lang >> $base/corpus/bad.dev.clean.$output_lang
+
+cat $base/corpus/dev.clean.shufwords.$input_lang >> $base/corpus/bad.dev.clean.$input_lang
+cat $base/corpus/dev.clean.shufboth.$output_lang >> $base/corpus/bad.dev.clean.$output_lang
+
+for lang in $input_lang $output_lang; do
+  (    vocab=$modeldir/ngram/vocab.$lang                                        
+    map_unk=`tail -n 1 $vocab`                                                  
+    test=$base/corpus/dev.clean
+    [ ! -f $test.s.$lang ] && ( cat $test.$lang | awk '{printf("<s> %s </s>\n", $0)}' > $test.s.$lang )
+    echo $lang good
+    $srilm/ngram -map-unk $map_unk -lm $modeldir/lm.$lang -order $ngram_order -ppl $test.s.$lang -debug 1 2>&1 \
+      | tee $base/logs/raw.ngram.good.$lang | egrep "(logprob.*ppl.*ppl1=)|( too many words per sentence)" | head -n -1 | awk '{print log($6)}' > $base/logs/ngram.good.$lang
+
+    test=$base/corpus/dev.clean.shufwords
+    [ ! -f $test.s.$lang ] && ( cat $test.$lang | awk '{printf("<s> %s </s>\n", $0)}' > $test.s.$lang )
+    echo $lang bad
+    $srilm/ngram -map-unk $map_unk -lm $modeldir/lm.$lang -order $ngram_order -ppl $test.s.$lang -debug 1 2>&1 \
+      | tee $base/logs/raw.ngram.bad.$lang | egrep "(logprob.*ppl.*ppl1=)|( too many words per sentence)" | head -n -1 | awk '{print log($6)}' > $base/logs/ngram.bad.$lang
+  )
+done
+#wait
+
+paste $base/logs/ngram.good.?? | awk '{print $1+$2}' > $base/logs/ngram.good
+paste $base/logs/ngram.bad.??  | awk '{print $1+$2}' > $base/logs/ngram.bad
+
+n=`wc $base/logs/ngram.good | awk '{print $1}'`
+
+cat $base/logs/ngram.{good,bad} | awk '{print NR,$0}' > $base/logs/ngram.both
+
+cat $base/logs/ngram.both | sort -k2 -g | head -n $n | sort -k1n | grep -n "$n " | sed "s=:= =g" | awk '{print "the quality of the lm is", $1 / $2, " out of 1.0"}'
 
 touch $working/$id/.done.1
 echo "[step-1] finished."
