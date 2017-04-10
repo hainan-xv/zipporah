@@ -8,8 +8,9 @@ config=$1
 f2e=$modeldir/dict.$input_lang-$output_lang
 e2f=$modeldir/dict.$output_lang-$input_lang
 
-for data in bad dev bad.dev; do
-  test=$working/$id/step-2/corpus/$data.clean
+#for data in bad dev bad.dev; do
+for data in bad.dev; do
+  test=$working/$id/step-2/corpus/$data
 
   base=$working/$id/step-3/$data
   mkdir -p $base

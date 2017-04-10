@@ -20,6 +20,10 @@ fi
 
 mkdir -p $savefolder
 
+cat $data_file | shuf | head -n 10000 > $savefolder/data
+
+data_file=$savefolder/data
+
 m=`head -n 1 $data_file | awk '{print NF}'`
 n=`wc -l $data_file |awk '{print $1}'`
 
