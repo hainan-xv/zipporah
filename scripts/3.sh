@@ -8,8 +8,8 @@ config=$1
 f2e=$modeldir/dict.$input_lang-$output_lang
 e2f=$modeldir/dict.$output_lang-$input_lang
 
-#for data in bad dev bad.dev; do
-for data in bad.dev; do
+for data in bad dev bad.dev; do
+  echo Processing $data data
   test=$working/$id/step-2/corpus/$data
 
   base=$working/$id/step-3/$data
@@ -61,7 +61,6 @@ for data in bad.dev; do
 
     $srilm/ngram -map-unk $map_unk -lm $modeldir/lm.$lang -order $ngram_order -ppl $test.s.$lang -debug 1 2>&1 \
       | tee $base/ngram.raw.$lang | egrep "(logprob.*ppl.*ppl1=)|( too many words per sentence)" | head -n -1 | awk '{print log($6)}' > $base/ngram.$lang
-    cat $base/ngram.raw.$lang | grep "sentences.*words.*OOVs" | head -n -1 | awk '{print $5/$3}' > $base/oov-rate.$lang
   ) &
   done
   
