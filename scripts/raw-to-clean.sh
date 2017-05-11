@@ -27,20 +27,20 @@ mkdir -p $tmpdir
 #    $moses/scripts/tokenizer/tokenizer.perl -l $lang -no-escape -threads 16 > $clean
 
 cat $raw | sed "s=????==g" | sed "s=???==g" | sed "s=??==g" | \
-    $moses/scripts/tokenizer/tokenizer.perl -l $lang -threads 16 > $clean
+    $moses/scripts/tokenizer/tokenizer.perl -l $lang -threads 16 > $tmpdir/${file}.tokenized
 
 #$moses/scripts/tokenizer/tokenizer.perl -l $lang \
 #    -threads 16                                          \
 #    < $raw                                               \
 #    > $tmpdir/${file}.tokenized
 #
-#if [ ! -f $tmpdir/truecase-model.$lang ]; then
-#$moses/scripts/recaser/train-truecaser.perl \
-#    --model $tmpdir/truecase-model.$lang --corpus     \
-#    $tmpdir/${file}.tokenized
-#fi
-#
-#$moses/scripts/recaser/truecase.perl \
-#    --model $tmpdir/truecase-model.$lang    \
-#    < $tmpdir/${file}.tokenized                 \
-#    > $clean
+if [ ! -f $tmpdir/truecase-model.$lang ]; then
+$moses/scripts/recaser/train-truecaser.perl \
+    --model $tmpdir/truecase-model.$lang --corpus     \
+    $tmpdir/${file}.tokenized
+fi
+
+$moses/scripts/recaser/truecase.perl \
+    --model $tmpdir/truecase-model.$lang    \
+    < $tmpdir/${file}.tokenized                 \
+    > $clean

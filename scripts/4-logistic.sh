@@ -5,7 +5,14 @@ config=$1
 
 mkdir -p $working/$id/step-4/
 
+devbase=$working/$id/step-4/dev
+baddevbase=$working/$id/step-4/bad.dev
+testbase=$working/$id/step-4/bad
+
+base=$working/$id/step-4/logistic/
+
 #false && for data in dev bad.dev bad; do
+(
 for data in dev bad.dev bad; do
   score_dir=$working/$id/step-3/$data
   output_dir=$working/$id/step-4/$data
@@ -25,11 +32,6 @@ for data in dev bad.dev bad; do
   echo END OF OUTPUT
 done
 
-devbase=$working/$id/step-4/dev
-baddevbase=$working/$id/step-4/bad.dev
-testbase=$working/$id/step-4/bad
-
-base=$working/$id/step-4/logistic/
 mkdir -p $base
 
 cat $devbase/feats.txt $baddevbase/feats.txt >  $base/train.feats
@@ -38,10 +40,17 @@ cat $baddevbase/feats.txt | awk '{print 0}'  >> $base/train.label
 
 echo python scripts/logistic.py $base/train.feats $base/train.label $testbase/feats.txt $testbase/scores.txt
 python scripts/logistic.py $base/train.feats $base/train.label $testbase/feats.txt $testbase/scores.txt
+)
+
+paste $working/$id/step-2/corpus/bad.{$output_lang,$input_lang} $testbase/scores.txt | xz > $testbase/corpus.xz
+
+exit
 
 (
 paste $testbase/scores.txt $testbase/tr.sum $working/$id/step-2/corpus/bad.{$input_lang,$output_lang} > $working/$id/step-4/pasted.txt
 paste $testbase/scores.txt $testbase/feats.txt > $working/$id/step-4/scores.feats
+
+mkdir -p $working/$id/step-4/tmp
 
 sort -k1gr -k2g --parallel=8 -T $working/$id/step-4/tmp $working/$id/step-4/pasted.txt > $working/$id/step-4/pasted.sorted.txt
 sort -k1gr -k2g --parallel=8 -T $working/$id/step-4/tmp $working/$id/step-4/scores.feats > $working/$id/step-4/pasted.sorted.feats
