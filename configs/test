@@ -1,0 +1,77 @@
+# this file has location variables used throughout the system
+
+input_lang=de
+output_lang=en
+
+#==============================================================================
+working=/export/b03/hxu/MT_experiments/empty_try/zipporah/working
+ROOT=/export/b03/hxu/MT_experiments/empty_try/zipporah
+
+moses=/export/a11/hxu/mosesdecoder
+srilm=/export/a11/hxu/tools/srilm/bin/i686-m64
+
+# model variables
+#==============================================================================
+
+clean_stem_good=/export/b03/hxu/data-selection/clean_corpus/de-en/good.de-en.short
+raw_stem_bad=/export/b03/hxu/MT_experiments/data/de-en/bad.short
+clean_stem_dev=/export/b03/hxu/data-selection/clean_corpus/de-en/news.de-en
+
+#==============================================================================
+
+aligner=fast-align
+align_job=1
+
+dict_count_thresh=1
+dict_total_count_thresh=1
+
+#==============================================================================
+# features to use
+#==============================================================================
+
+bow_constant=0.0001
+translation_num_jobs=50
+
+min_ac_forward=
+min_ac_backward=
+
+min_lm_fr=
+min_lm_en=
+
+max_ac_forward=
+max_ac_backward=
+
+max_lm_fr=
+max_lm_en=
+
+
+
+ngram_order=5
+word_count=30000
+
+clust=/export/a11/hxu/tools/cluster-3.6.7
+
+#num_words_to_select="500000 1000000 2000000 5000000 10000000 20000000 50000000 100000000 200000000"
+num_words_to_select="500000 1000000 2000000 5000000 10000000 20000000 50000000 100000000 200000000 250000000 350000000 400000000"
+ngram_weight=0.15
+
+#==============================================================================
+# Below here is automatic scripts. Do not change anything
+#==============================================================================
+
+set -e
+
+if [ "$modeldir" != "" ]; then
+  for i in $modeldir/lm.$input_lang $modeldir/lm.$output_lang $modeldir/dict.${input_lang}-${output_lang} $modeldir/dict.${output_lang}-${input_lang}; do
+    [ ! -f $i ] && ( echo "model file $i does not exist" >&2 )
+  done
+fi
+lang_pair=${input_lang}-${output_lang}
+
+function check_equal_lines {
+  n1=`wc -l $1 | awk '{print $1}'`
+  n2=`wc -l $2 | awk '{print $1}'`
+  if [ $n1 -ne $n2 ]; then
+    echo "Unequal number of lines: $1 and $2" && exit 1
+  fi
+}
