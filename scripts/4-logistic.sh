@@ -38,8 +38,8 @@ cat $devbase/feats.txt $baddevbase/feats.txt >  $base/train.feats
 cat $devbase/feats.txt    | awk '{print 1}'  >  $base/train.label
 cat $baddevbase/feats.txt | awk '{print 0}'  >> $base/train.label
 
-echo python scripts/logistic.py $base/train.feats $base/train.label $testbase/feats.txt $testbase/scores.txt
-python scripts/logistic.py $base/train.feats $base/train.label $testbase/feats.txt $testbase/scores.txt
+echo python scripts/logistic.py $base/train.feats $base/train.label $base/model $testbase/feats.txt $testbase/scores.txt
+python scripts/logistic.py $base/train.feats $base/train.label $base/model $testbase/feats.txt $testbase/scores.txt
 )
 
 paste $working/$id/step-2/corpus/bad.{$output_lang,$input_lang} $testbase/scores.txt | xz > $testbase/corpus.xz

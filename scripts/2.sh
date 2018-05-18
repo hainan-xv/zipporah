@@ -30,13 +30,10 @@ else
   for i in $input_lang $output_lang; do
     $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_bad.$i $base/corpus/bad.long.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-bad.$i.log
   done
-fi 
-
-for c in bad; do
   $moses/scripts/training/clean-corpus-n.perl \
-    $base/corpus/$c.long $input_lang $output_lang \
-    $base/corpus/$c 3 80
-done
+    $base/corpus/bad.long $input_lang $output_lang \
+    $base/corpus/bad 3 80
+fi 
 
 ln -s $working/$id/step-1/corpus/dev.$input_lang $base/corpus
 ln -s $working/$id/step-1/corpus/dev.$output_lang $base/corpus

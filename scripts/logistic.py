@@ -4,11 +4,13 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import linear_model, datasets
+import pickle
 
 train_data  = sys.argv[1]
 train_label = sys.argv[2]
-test_data   = sys.argv[3]
-output_txt  = sys.argv[4]
+train_model = sys.argv[3]
+test_data   = sys.argv[4]
+output_txt  = sys.argv[5]
 
 X = np.loadtxt(train_data)
 Y = np.loadtxt(train_label)
@@ -26,6 +28,7 @@ error = num_errors / Y.shape[0]
 
 #print logreg.coef_
 print "Error rate on train is", error
+pickle.dump(logreg, open(train_model, 'wb'))
 
 devX = np.loadtxt(test_data)
 #devY = np.loadtxt(test_label)
