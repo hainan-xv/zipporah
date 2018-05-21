@@ -9,7 +9,7 @@ cd zipporah
 change the config file; an example is configs/test
 - will need the "working directory" as $working
 - will need the zipporah location as $ROOT
-- also need moses and srilm paths, but can keep it as it is on the CLSP grid
+- also need moses paths, but can keep it as it is on the CLSP grid
 - need clean_stem_good or raw_stem_good
 - need clean_stem_bad or raw_stem_bad
 - need clean_stem_dev or raw_stem_dev

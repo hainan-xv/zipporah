@@ -57,10 +57,8 @@ for data in bad dev bad.dev; do
   for lang in $input_lang $output_lang; do
   (    vocab=$modeldir/ngram/vocab.$lang
     map_unk=`tail -n 1 $vocab`
-    [ ! -f $test.s.$lang ] && ( cat $test.$lang | awk '{printf("<s> %s </s>\n", $0)}' > $test.s.$lang )
 
-    $srilm/ngram -map-unk $map_unk -lm $modeldir/lm.$lang -order $ngram_order -ppl $test.s.$lang -debug 1 2>&1 \
-      | tee $base/ngram.raw.$lang | egrep "(logprob.*ppl.*ppl1=)|( too many words per sentence)" | head -n -1 | awk '{print log($6)}' > $base/ngram.$lang
+    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) v[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(v[w] !=1) w=u printf("%s ", w)}; print""}' | $moses/bin/query -v sentence  $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.$lang
   ) &
   done
   

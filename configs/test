@@ -8,7 +8,6 @@ working=/export/b03/hxu/MT_experiments/empty_try/zipporah/working
 ROOT=/export/b03/hxu/MT_experiments/empty_try/zipporah
 
 moses=/export/a11/hxu/mosesdecoder
-srilm=/export/a11/hxu/tools/srilm/bin/i686-m64
 
 # model variables
 #==============================================================================
