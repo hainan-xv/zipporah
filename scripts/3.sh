@@ -58,7 +58,7 @@ for data in bad dev bad.dev; do
   (    vocab=$modeldir/ngram/vocab.$lang
     map_unk=`tail -n 1 $vocab`
 
-    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) v[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(v[w] !=1) w=u printf("%s ", w)}; print""}' | $moses/bin/query -v sentence  $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.$lang
+    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence  $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/ngram.$lang
   ) &
   done
   

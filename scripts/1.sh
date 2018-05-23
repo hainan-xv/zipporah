@@ -81,7 +81,7 @@ for lang in $input_lang $output_lang; do
 (  vocab=$base/model/ngram/vocab.$lang
   cat $train.$lang | awk '{for(i=1;i<=NF;i++)print$i}' | sort | uniq -c | sort -n -k1 -r | head -n $word_count | awk '{print$2}' > $vocab
   echo Training LM for $lang
-  $moses/bin/lmplz --order $ngram_order --limit_vocab_file $vocab -text $train.$lang --arpa $base/model/lm.$lang
+  $moses/bin/lmplz -S 20% --order $ngram_order --limit_vocab_file $vocab --text $train.$lang --arpa $base/model/lm.$lang
   $moses/bin/build_binary $base/model/lm.$lang $base/model/bin.lm.$lang
   ) &
 done
@@ -113,11 +113,11 @@ for lang in $input_lang $output_lang; do
     map_unk=`tail -n 1 $vocab`                                                  
     test=$base/corpus/dev
     echo $lang good
-    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) v[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(v[w] !=1) w=u printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.good.$lang
+    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.good.$lang
 
     test=$base/corpus/dev.shufwords
     echo $lang bad
-    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) v[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(v[w] !=1) w=u printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.bad.$lang
+    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.bad.$lang
   ) &
 done
 wait
