@@ -55,7 +55,7 @@ fi
 
 echo "[step-1] test dictionary on dev data"
 
-cat $base/corpus/dev.$output_lang | ./scripts/shuf.sh > $base/corpus/dev.shuf.$output_lang
+cat $base/corpus/dev.$output_lang | $ROOT/scripts/shuf.sh > $base/corpus/dev.shuf.$output_lang
 
 $ROOT/tools/generate-bow-xent $base/model/dict.$output_lang-$input_lang $base/corpus/dev.$output_lang $base/corpus/dev.$input_lang $bow_constant > $base/logs/xent.good.$output_lang-$input_lang &
 $ROOT/tools/generate-bow-xent $base/model/dict.$input_lang-$output_lang $base/corpus/dev.$input_lang $base/corpus/dev.$output_lang $bow_constant > $base/logs/xent.good.$input_lang-$output_lang &
@@ -91,9 +91,9 @@ echo "[step-1] test lm's on dev data"
 modeldir=$working/$id/step-1/model 
 
 for data in dev; do
-  cat $base/corpus/$data.$input_lang | python ./scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$input_lang
-  cat $base/corpus/$data.$output_lang | python ./scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$output_lang
-  cat $base/corpus/$data.shufwords.$output_lang | ./scripts/shuf.sh > $base/corpus/$data.shufboth.$output_lang
+  cat $base/corpus/$data.$input_lang | python $ROOT/scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$input_lang
+  cat $base/corpus/$data.$output_lang | python $ROOT/scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$output_lang
+  cat $base/corpus/$data.shufwords.$output_lang | $ROOT/scripts/shuf.sh > $base/corpus/$data.shufboth.$output_lang
 
 # good fluency bad adequacy
   cat $base/corpus/$data.$input_lang > $base/corpus/bad.$data.$input_lang
