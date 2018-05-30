@@ -81,7 +81,7 @@ for lang in $input_lang $output_lang; do
 (  vocab=$base/model/ngram/vocab.$lang
   cat $train.$lang | awk '{for(i=1;i<=NF;i++)print$i}' | sort | uniq -c | sort -n -k1 -r | head -n $word_count | awk '{print$2}' > $vocab
   echo Training LM for $lang
-  $moses/bin/lmplz -S 20% --order $ngram_order --limit_vocab_file $vocab --text $train.$lang --arpa $base/model/lm.$lang
+  $moses/bin/lmplz --prune 0 0 1 -S 10G --order $ngram_order --limit_vocab_file $vocab --text $train.$lang --arpa $base/model/lm.$lang
   $moses/bin/build_binary $base/model/lm.$lang $base/model/bin.lm.$lang
   ) &
 done
