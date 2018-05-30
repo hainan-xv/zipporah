@@ -113,11 +113,15 @@ for lang in $input_lang $output_lang; do
     map_unk=`tail -n 1 $vocab`                                                  
     test=$base/corpus/dev
     echo $lang good
-    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.good.$lang
+    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.good.total.$lang
+    cat $test.$lang | awk '{print NF + 1}' > $base/logs/ngram.good.length  # +1 because of the EOS symbol
+    paste $base/logs/ngram.good.total.$lang $base/logs/ngram.good.length | awk '{print $1 / $2}' > $base/logs/ngram.good.$lang
 
     test=$base/corpus/dev.shufwords
     echo $lang bad
-    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.bad.$lang
+    cat $test.$lang | awk -v v=$vocab -v u=$map_unk 'BEGIN{while((getline<v)>0) m[$1]=1;}{for(i=1;i<=NF;i++) {w=$i; if(m[w] !=1) w=u; printf("%s ", w)}; print""}' | $moses/bin/query -v sentence $modeldir/bin.lm.$lang | grep ^Total | awk '{print -$2}' > $base/logs/ngram.bad.total.$lang
+    cat $test.$lang | awk '{print NF + 1}' > $base/logs/ngram.bad.length  # +1 because of the EOS symbol
+    paste $base/logs/ngram.bad.total.$lang $base/logs/ngram.bad.length | awk '{print $1 / $2}' > $base/logs/ngram.bad.$lang
   ) &
 done
 wait
