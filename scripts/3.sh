@@ -42,7 +42,7 @@ for data in bad dev bad.dev; do
 
   done
 
-  if [ $gridengine == "true" ]; then
+  if [ $gridengine == "false" ]; then
     n=$translation_num_jobs
     for i in `seq -w $[$translation_num_jobs-1] -1 0`; do 
       $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.in.$n $tmpfolder/s.out.$n $f2e $tmpfolder/out.f2e.$n
