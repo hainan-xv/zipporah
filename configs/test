@@ -19,8 +19,7 @@ clean_stem_dev=/export/b03/hxu/data-selection/clean_corpus/de-en/news.de-en
 #==============================================================================
 
 aligner=fast-align
-fast_align_bin=/home/pkoehn/statmt/project/fast_align/build/fast_align
-atools_bin=/home/pkoehn/statmt/project/fast_align/build/atools
+fast_align_build=/home/pkoehn/statmt/project/fast_align/build
 align_job=1
 
 dict_count_thresh=1
