@@ -5,7 +5,7 @@ output_lang=en
 
 #==============================================================================
 working=/export/b03/hxu/MT_experiments/empty_try/zipporah/working
-ROOT=/export/b03/hxu/MT_experiments/empty_try/zipporah
+ROOT=/home/huda/zipporah
 
 moses=/export/a11/hxu/mosesdecoder
 
