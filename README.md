@@ -1,6 +1,6 @@
 # zipporah
 
-git clone https://github.com/hainan-xv/zipporah.git
+git clone https://github.com/khayrallah/zipporah.git
 
 cd zipporah
 
