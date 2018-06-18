@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#set -x
 
 config=$1
 . $config
@@ -26,7 +27,10 @@ if [ -f $clean_stem_good.$input_lang ] && [ -f $clean_stem_good.$output_lang ]; 
 else
   check_equal_lines $raw_stem_good.$input_lang $raw_stem_good.$output_lang
   for i in $input_lang $output_lang; do
-    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/train.$i $base/corpus/raw_to_clean $base/truecaser/truecase-model 2>&1 > $base/logs/raw-to-clean-good.$i.log
+    echo "running cleaning"
+    echo $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/train.$i $base/corpus/raw_to_clean $base/truecaser/truecase-model
+    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/train.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
+     echo "done cleaning"
   done
 fi 
 
@@ -49,7 +53,7 @@ if [ -f $clean_stem_dev.$input_lang ] && [ -f $clean_stem_dev.$output_lang ]; th
 else
   check_equal_lines $raw_stem_good.$input_lang $raw_stem_good.$output_lang
   for i in $input_lang $output_lang; do
-    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/dev.$i $base/corpus/raw_to_clean $base/truecaser/truecase-model 2>&1 > $base/logs/raw-to-clean-good.$i.log
+    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/dev.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
   done
 fi 
 
