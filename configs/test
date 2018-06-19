@@ -4,17 +4,21 @@ input_lang=de
 output_lang=en
 
 #==============================================================================
-working=/export/b03/hxu/MT_experiments/empty_try/zipporah/working
-ROOT=/export/b03/hxu/MT_experiments/empty_try/zipporah
+working=/export/b02/hxu/zipporah-master/working
+ROOT=/export/b02/hxu/zipporah-master
 
 moses=/export/a11/hxu/mosesdecoder
 
 # model variables
 #==============================================================================
 
-clean_stem_good=/export/b03/hxu/data-selection/clean_corpus/de-en/good.de-en.short
-raw_stem_bad=/export/b03/hxu/MT_experiments/data/de-en/bad.short
-clean_stem_dev=/export/b03/hxu/data-selection/clean_corpus/de-en/news.de-en
+raw_stem_good=/home/huda/experiment/wmt18-filtering-de-en/nmt/wmt_data/data/train.txt.tiny
+raw_stem_bad=/home/huda/experiment/wmt18-filtering-de-en/nmt/all_data/data/train.txt.tiny
+raw_stem_dev=/home/huda/experiment/wmt18-filtering-de-en/nmt/all_data/data/dev.txt
+
+#==============================================================================
+#point to truecaser trained on good data
+truecaser=/home/huda/experiment/wmt18-filtering-de-en/zipporah/truecase-model
 
 #==============================================================================
 
@@ -31,7 +35,7 @@ dict_total_count_thresh=1
 bow_constant=0.0001
 translation_num_jobs=50
 
-ngram_order=5
+ngram_order=3
 word_count=30000
 
 num_words_to_select="500000 1000000 2000000 5000000 10000000 20000000 50000000 100000000 200000000 250000000 350000000 400000000"
