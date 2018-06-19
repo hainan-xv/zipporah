@@ -40,7 +40,7 @@ cat $raw | sed "s=????==g" | sed "s=???==g" | sed "s=??==g" | \
 
 if [ ! -f $tmpdir/truecase-model.$lang ]; then
 $moses/scripts/recaser/train-truecaser.perl \
-    --model $truecaser.$lang --corpus     \
+    --model $tmpdir/truecase-model.$lang --corpus     \
     $tmpdir/${file}.tokenized
 fi
 
