@@ -26,8 +26,10 @@ if [ -f $clean_stem_good.$input_lang ] && [ -f $clean_stem_good.$output_lang ]; 
 else
   check_equal_lines $raw_stem_good.$input_lang $raw_stem_good.$output_lang
   for i in $input_lang $output_lang; do
-    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/train.$i $base/corpus/raw_to_clean $base/truecaser/truecase-model 2>&1 > $base/logs/raw-to-clean-good.$i.log
+    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/train.long.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
   done
+
+  $moses/scripts/training/clean-corpus-n.perl $base/corpus/train.long $input_lang $output_lang $base/corpus/train 1 80
 fi 
 
 echo "[step-1] generate alignment"
@@ -47,11 +49,24 @@ if [ -f $clean_stem_dev.$input_lang ] && [ -f $clean_stem_dev.$output_lang ]; th
   [ ! -f $base/corpus/dev.$input_lang ] && ln -s $clean_stem_dev.$input_lang  $base/corpus/dev.$input_lang
   [ ! -f $base/corpus/dev.$output_lang ] && ln -s $clean_stem_dev.$output_lang $base/corpus/dev.$output_lang
 else
-  check_equal_lines $raw_stem_good.$input_lang $raw_stem_good.$output_lang
+  check_equal_lines $raw_stem_dev.$input_lang $raw_stem_dev.$output_lang
   for i in $input_lang $output_lang; do
-    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/dev.$i $base/corpus/raw_to_clean $base/truecaser/truecase-model 2>&1 > $base/logs/raw-to-clean-good.$i.log
+    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_dev.$i $base/corpus/dev.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
   done
 fi 
+
+echo "[step-1] processing bad dev corpus"
+if [ -f $clean_stem_bad_dev.$input_lang ] && [ -f $clean_stem_bad_dev.$output_lang ]; then
+  check_equal_lines $clean_stem_bad_dev.$input_lang $clean_stem_bad_dev.$output_lang
+  [ ! -f $base/corpus/bad_dev.$input_lang ] && ln -s $clean_stem_bad_dev.$input_lang  $base/corpus/bad_dev.$input_lang
+  [ ! -f $base/corpus/bad_dev.$output_lang ] && ln -s $clean_stem_bad_dev.$output_lang $base/corpus/bad_dev.$output_lang
+else
+  check_equal_lines $raw_stem_bad_dev.$input_lang $raw_stem_bad_dev.$output_lang
+  for i in $input_lang $output_lang; do
+    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_bad_dev.$i $base/corpus/bad_dev.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
+  done
+fi 
+
 
 echo "[step-1] test dictionary on dev data"
 
@@ -90,23 +105,25 @@ wait
 echo "[step-1] test lm's on dev data"
 modeldir=$working/$id/step-1/model 
 
-for data in dev; do
-  cat $base/corpus/$data.$input_lang | python $ROOT/scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$input_lang
-  cat $base/corpus/$data.$output_lang | python $ROOT/scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$output_lang
-  cat $base/corpus/$data.shufwords.$output_lang | $ROOT/scripts/shuf.sh > $base/corpus/$data.shufboth.$output_lang
-
-# good fluency bad adequacy
-  cat $base/corpus/$data.$input_lang > $base/corpus/bad.$data.$input_lang
-  cat $base/corpus/$data.shuf.$output_lang > $base/corpus/bad.$data.$output_lang
-
-# good adequacy bad fluency
-  cat $base/corpus/$data.shufwords.$input_lang >> $base/corpus/bad.$data.$input_lang
-  cat $base/corpus/$data.shufwords.$output_lang >> $base/corpus/bad.$data.$output_lang
-
-# bad both
-  cat $base/corpus/$data.shufwords.$input_lang >> $base/corpus/bad.$data.$input_lang
-  cat $base/corpus/$data.shufboth.$output_lang >> $base/corpus/bad.$data.$output_lang
-done
+#for data in dev; do
+#  cat $base/corpus/$data.$input_lang | python $ROOT/scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$input_lang
+#  cat $base/corpus/$data.$output_lang | python $ROOT/scripts/shuffle-within-lines.py > $base/corpus/$data.shufwords.$output_lang
+#  cat $base/corpus/$data.shufwords.$output_lang | $ROOT/scripts/shuf.sh > $base/corpus/$data.shufboth.$output_lang
+#
+## good fluency bad adequacy
+#  cat $base/corpus/$data.$input_lang > $base/corpus/bad.$data.$input_lang
+#  cat $base/corpus/$data.shuf.$output_lang > $base/corpus/bad.$data.$output_lang
+#
+## good adequacy bad fluency
+#  cat $base/corpus/$data.shufwords.$input_lang >> $base/corpus/bad.$data.$input_lang
+#  cat $base/corpus/$data.shufwords.$output_lang >> $base/corpus/bad.$data.$output_lang
+#
+## bad both
+#  cat $base/corpus/$data.shufwords.$input_lang >> $base/corpus/bad.$data.$input_lang
+#  cat $base/corpus/$data.shufboth.$output_lang >> $base/corpus/bad.$data.$output_lang
+#done
+cp $base/corpus/bad_dev.$input_lang $base/corpus/bad.dev.$input_lang
+cp $base/corpus/bad_dev.$output_lang $base/corpus/bad.dev.$output_lang
 
 for lang in $input_lang $output_lang; do
   ( vocab=$modeldir/ngram/vocab.$lang                                        

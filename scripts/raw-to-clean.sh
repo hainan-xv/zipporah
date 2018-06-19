@@ -5,7 +5,7 @@ lang=$2
 raw=$3
 clean=$4
 tmpdir=$5
-truecaser=$6
+#truecaser=$6
 
 file=`basename $raw`
 
@@ -35,6 +35,9 @@ cat $raw | sed "s=????==g" | sed "s=???==g" | sed "s=??==g" | \
 #    < $raw                                               \
 #    > $tmpdir/${file}.tokenized
 #
+
+[ -f $truecaser.$lang ] && cp $truecaser.$lang $tmpdir/truecase-model.$lang
+
 if [ ! -f $tmpdir/truecase-model.$lang ]; then
 $moses/scripts/recaser/train-truecaser.perl \
     --model $truecaser.$lang --corpus     \
