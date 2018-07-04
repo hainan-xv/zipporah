@@ -46,9 +46,9 @@ if [ -f $clean_stem_dev.$input_lang ] && [ -f $clean_stem_dev.$output_lang ]; th
   [ ! -f $base/corpus/dev.$input_lang ] && ln -s $clean_stem_dev.$input_lang  $base/corpus/dev.$input_lang
   [ ! -f $base/corpus/dev.$output_lang ] && ln -s $clean_stem_dev.$output_lang $base/corpus/dev.$output_lang
 else
-  check_equal_lines $raw_stem_good.$input_lang $raw_stem_good.$output_lang
+  check_equal_lines $raw_stem_dev.$input_lang $raw_stem_dev.$output_lang
   for i in $input_lang $output_lang; do
-    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_good.$i $base/corpus/dev.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
+    $ROOT/scripts/raw-to-clean.sh $config $i $raw_stem_dev.$i $base/corpus/dev.$i $base/corpus/raw_to_clean 2>&1 > $base/logs/raw-to-clean-good.$i.log
   done
 fi 
 
