@@ -5,6 +5,7 @@ for Noisy Web-Crawled Parallel Corpora."
 
 If you have question, feel free to email me at hainan.xv AT gmail Dot com. I left my JHU email in the paper however it seems to classify some of the query emails as spam. 
 
+### Step 1,
 ```
 $> git clone https://github.com/hainan-xv/zipporah.git
 $> cd zipporah
@@ -12,6 +13,7 @@ $> git checkout paper-version
 $> ./make.sh
 ```
 
+### Step 2,
 Change the config file; an example is `configs/test`. First you need to change the following variables,
 ```
 working=/your/working/directory/
@@ -20,7 +22,8 @@ moses=your/path/to/mosesdecoder/
 srilm=your/path/to/srilm/   # for branch paper-version only
 ```
 
-Then provide the location for your corpus. We need good/dev/bad-corpus variables set. The meaning of those corpora are,
+### Step 3,
+Provide the location for your corpus. We need good/dev/bad-corpus variables set. The meaning of those corpora are,
 - "bad" corpus refers to the data you want to filter on;
 - "good" corpus refers to the "training data" described in the paper. We recommend that you use a large and clean corpus for this, e.g. Europarl
 - "dev" corpus refers to the "dev data" in the paper. We recommend that you use a clean corpus for this, and a size of 2000-3000 parallel sentence pairs is sufficient.
@@ -43,8 +46,7 @@ clean_stem_dev=your/tokenized/and/truecased/dev/data
 
 The word "clean" or "raw" would indicate whether the corpus is tokenized and truecased. If it's raw, then Zipporah would try to tokenize and truecase them; if "clean" is provided then Zipporah would start processing them directly.]
 
-
-then 
+### Step 4, 
 ```
 $> ./run.sh [config-file]
 ```
