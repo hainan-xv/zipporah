@@ -42,9 +42,9 @@ clean_stem_good=your/tokenized/and/truecased/train/data
 clean_stem_dev=your/tokenized/and/truecased/dev/data
 ```
 
-[The *stem_good/*stem_bad variables should be a prefix of text files. For example, if clean_stem_dev is `/home/user/newstest` and input/output-lang are es/en, then the system would look for file `/home/user/newstest.es` and `/home/user/newstest.en` and use them as the "dev data".
+The `*stem_good/*stem_bad` variables should be a prefix of text files. For example, if `clean_stem_dev` is `/home/user/newstest` and `input/output-lang` are `es/en`, then the system would look for file `/home/user/newstest.es` and `/home/user/newstest.en` and use them as the "dev data".
 
-The word "clean" or "raw" would indicate whether the corpus is tokenized and truecased. If it's raw, then Zipporah would try to tokenize and truecase them; if "clean" is provided then Zipporah would start processing them directly.]
+The word "clean" or "raw" would indicate whether the corpus is tokenized and truecased. If it's raw, then Zipporah would try to tokenize and truecase them; if "clean" is provided then Zipporah would start processing them directly.
 
 ### Step 4, 
 ```
@@ -57,7 +57,7 @@ would run the data selection and generate a score file in
 (experiment_id will be an integer starting from 0; if a directory n is already
 there, then experiment_id will become n+1)
 
-./run.sh supports more arguments 
+`./run.sh` supports more arguments 
 - `./run.sh config-file experiment-id` would force to use the experiment-id argument
 - `./run.sh config-file experiment-id` stage would start at a specific stage
 
