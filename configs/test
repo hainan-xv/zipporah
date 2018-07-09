@@ -1,13 +1,15 @@
-# this file has location variables used throughout the system
+# This file has location variables used throughout the system
+# Please refer to the paper https://www.cs.jhu.edu/~hxu/zipporah.pdf for details
+# for the method.
 
 input_lang=de
 output_lang=en
 
 #==============================================================================
-working=/export/b03/hxu/MT_experiments/empty_try/zipporah/working
-ROOT=/export/b03/hxu/MT_experiments/empty_try/zipporah
+working=/export/b03/hxu/MT_experiments/empty_try/zipporah/working  # working directory for experiments
+ROOT=/export/b03/hxu/MT_experiments/empty_try/zipporah  # location of zipporah
 
-moses=/export/a11/hxu/mosesdecoder
+moses=/export/a11/hxu/mosesdecoder  # location of moses
 
 # model variables
 #==============================================================================
@@ -21,18 +23,27 @@ clean_stem_dev=/export/b03/hxu/data-selection/clean_corpus/de-en/news.de-en
 aligner=fast-align
 align_job=1
 
-dict_count_thresh=1
-dict_total_count_thresh=1
+# Those 2 variables has to do with generating word dictionaries. The dictionary
+# computes, for a word-pair {de, en}, p(de | en) and p(en | de), computed by a
+# simple counting method.
+dict_count_thresh=1  # Only words with counts larger than this number is considered for numerator.
+dict_total_count_thresh=1  # Only words with counts larger than this number is considered for denominator.
 
 #==============================================================================
 # features to use
 #==============================================================================
 
-bow_constant=0.0001
+bow_constant=0.0001 # This has to do with KL-divergence computation when we compute
+                    # scores. A constant is needed to be added to the denominator
+                    # to avoid division by 0. Please refer to the paper (section 3.1.1)
+                    # https://www.cs.jhu.edu/~hxu/zipporah.pdf for details.
 translation_num_jobs=50
 
-ngram_order=5
-word_count=30000
+ngram_order=5       # n-gram order for language modeling.
+word_count=30000    # we take top n most frequent words in the corpus to train
+                    # language models, and word_count is the size of the shortlist.
+                    # An out-of-shortlist word will be mapped to the least frequent
+                    # word in the shortlist for computing probabilities.
 
 num_words_to_select="500000 1000000 2000000 5000000 10000000 20000000 50000000 100000000 200000000 250000000 350000000 400000000"
 
