@@ -18,6 +18,7 @@ clean_stem_good=/export/b03/hxu/data-selection/clean_corpus/de-en/good.de-en.sho
 raw_stem_bad=/export/b03/hxu/MT_experiments/data/de-en/bad.short
 clean_stem_dev=/export/b03/hxu/data-selection/clean_corpus/de-en/news.de-en
 
+# you probably don't need to change the variables below this point.
 #==============================================================================
 
 aligner=fast-align
@@ -45,6 +46,8 @@ word_count=30000    # we take top n most frequent words in the corpus to train
                     # An out-of-shortlist word will be mapped to the least frequent
                     # word in the shortlist for computing probabilities.
 
+# for each number in the string, we will generate parallel sentence pairs picked from the original corpus such that
+# their total number of words doesn't exceed the number.
 num_words_to_select="500000 1000000 2000000 5000000 10000000 20000000 50000000 100000000 200000000 250000000 350000000 400000000"
 
 #==============================================================================

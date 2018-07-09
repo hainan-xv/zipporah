@@ -5,26 +5,51 @@ for Noisy Web-Crawled Parallel Corpora."
 
 If you have question, feel free to email me at hainan.xv AT gmail Dot com. I left my JHU email in the paper however it seems to classify some of the query emails as spam. 
 
-git clone https://github.com/hainan-xv/zipporah.git
+```
+$> git clone https://github.com/hainan-xv/zipporah.git
+$> cd zipporah
+$> git checkout paper-version
+$> ./make.sh
+```
 
-cd zipporah
+Change the config file; an example is `configs/test`. First you need to change the following variables,
+```
+working=/your/working/directory/
+ROOT=/your/path/to/zipporah/
+moses=your/path/to/mosesdecoder/
+srilm=your/path/to/srilm/   # for branch paper-version only
+```
 
-./make.sh
+Then provide the location for your corpus. We need good/dev/bad-corpus variables set. The meaning of those corpora are,
+- "bad" corpus refers to the data you want to filter on;
+- "good" corpus refers to the "training data" described in the paper. We recommend that you use a large and clean corpus for this, e.g. Europarl
+- "dev" corpus refers to the "dev data" in the paper. We recommend that you use a clean corpus for this, and a size of 2000-3000 parallel sentence pairs is sufficient.
 
-change the config file; an example is configs/test
+Have either
 
-- will need the "working directory" as $working
-- will need the zipporah location as $ROOT
-- also need moses paths, but can keep it as it is on the CLSP grid
-- need clean_stem_good or raw_stem_good (this refers to the "training data" described in the paper, which we use to train a language model and a dictionary. We recommend that you use a clean and large corpus for this, e.g. Europarl)
-- need clean_stem_bad or raw_stem_bad (this refers to the "bad data" which we want to filter on)
-- need clean_stem_dev or raw_stem_dev  (this refers to the "dev data" in the paper, in which we use to train a logistic regression model and use to compute scores. We recommend that you use a clean corpus for this, and it doesn't need to be large. Any newstest corpus would suffice here. A dev-corpus with 2000-3000 parallel sentence pairs is enough to train a good classifier)
+```
+raw_stem_bad=your/raw//data/that/you/want/to/clean
+raw_stem_good=your/raw/train/data
+raw_stem_dev=your/raw/dev/data
+```
+or
+```
+clean_stem_bad=your/tokenized/and/truecased/data/that/you/want/to/clean
+clean_stem_good=your/tokenized/and/truecased/train/data
+clean_stem_dev=your/tokenized/and/truecased/dev/data
+```
 
-[The *stem_good/*stem_bad variables are supposed to be a prefix of text files. For example, if clean_stem_dev is /home/user/newstest and input/output-lang are es/en, then the system would look for file /home/user/newstest.es and /home/user/newstest.en and use them as the "dev data".
+[The *stem_good/*stem_bad variables should be a prefix of text files. For example, if clean_stem_dev is /home/user/newstest and input/output-lang are es/en, then the system would look for file /home/user/newstest.es and /home/user/newstest.en and use them as the "dev data".
 
 The word "clean" or "raw" would indicate whether the corpus is tokenized and truecased. If it's raw, then Zipporah would try to tokenize and truecase them; if "clean" is provided then Zipporah would start processing them directly.]
 
-then ./run.sh [config-file] would run the data selection and generate a score file in
+
+then 
+```
+$> ./run.sh [config-file]
+```
+
+would run the data selection and generate a score file in
 $working/$experiment_id/step-4/bad/corpus.xz
 
 (experiment_id will be an integer starting from 0; if a directory n is already
@@ -39,7 +64,6 @@ There are 4 stages in the system, see scripts/[1234].sh
 - 2.sh processes bad data
 - 3.sh computes the features on all data
 - 4.sh trains the logistic regression model and computes scores
-
 
 Common issues:
 
