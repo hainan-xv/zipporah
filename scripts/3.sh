@@ -39,10 +39,20 @@ for data in bad dev bad.dev; do
 #    mv $tmpfolder/s.in.$i $tmpfolder/s.in.$n
 #    mv $tmpfolder/s.out.$i $tmpfolder/s.out.$n
     n=$[$n-1]
+
   done
 
-  $ROOT/scripts/queue.pl JOB=1:$translation_num_jobs $tmpfolder/compute-kl.f2e.JOB.log $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.in.JOB $tmpfolder/s.out.JOB $f2e $tmpfolder/out.f2e.JOB 
-  $ROOT/scripts/queue.pl JOB=1:$translation_num_jobs $tmpfolder/compute-kl.e2f.JOB.log $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.out.JOB $tmpfolder/s.in.JOB $e2f $tmpfolder/out.e2f.JOB
+  if [ $gridengine == "false" ]; then
+    n=$translation_num_jobs
+    for i in `seq -w $[$translation_num_jobs-1] -1 0`; do 
+      $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.in.$n $tmpfolder/s.out.$n $f2e $tmpfolder/out.f2e.$n
+      $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.out.$n $tmpfolder/s.in.$n $e2f $tmpfolder/out.e2f.$n
+       n=$[$n-1]
+    done
+  else
+    $ROOT/scripts/queue.pl JOB=1:$translation_num_jobs $tmpfolder/compute-kl.f2e.JOB.log $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.in.JOB $tmpfolder/s.out.JOB $f2e $tmpfolder/out.f2e.JOB 
+    $ROOT/scripts/queue.pl JOB=1:$translation_num_jobs $tmpfolder/compute-kl.e2f.JOB.log $ROOT/scripts/generate-translation-scores.sh $config $tmpfolder/s.out.JOB $tmpfolder/s.in.JOB $e2f $tmpfolder/out.e2f.JOB
+  fi
 
   touch $base/translation.$input_lang-$output_lang $base/translation.$output_lang-$input_lang
   rm    $base/translation.$input_lang-$output_lang $base/translation.$output_lang-$input_lang
