@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -x
 function check_equal_lines {
   n1=`wc -l $1 | awk '{print $1}'`
   n2=`wc -l $2 | awk '{print $1}'`

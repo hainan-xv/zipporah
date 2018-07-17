@@ -5,7 +5,7 @@ lang=$2
 raw=$3
 clean=$4
 tmpdir=$5
-truecaser=$6
+#truecaser=$6
 
 file=`basename $raw`
 
@@ -16,6 +16,8 @@ if [ ! $# -eq 5 ]; then
   exit 1
 fi
 
+echo $config
+echo config
 . $config
 
 set -v
@@ -35,11 +37,11 @@ cat $raw | sed "s=????==g" | sed "s=???==g" | sed "s=??==g" | \
 #    < $raw                                               \
 #    > $tmpdir/${file}.tokenized
 #
-if [ ! -f $tmpdir/truecase-model.$lang ]; then
-$moses/scripts/recaser/train-truecaser.perl \
-    --model $truecaser.$lang --corpus     \
-    $tmpdir/${file}.tokenized
-fi
+#if [ ! -f $tmpdir/truecase-model.$lang ]; then
+#$moses/scripts/recaser/train-truecaser.perl \
+#    --model $truecaser.$lang --corpus     \
+#    $tmpdir/${file}.tokenized
+#fi
 
 $moses/scripts/recaser/truecase.perl \
     --model $truecaser.$lang    \
