@@ -16,9 +16,9 @@ if [ "$aligner" == "fast-align" ]; then
 
   if [ "$align_job" == "" ] || [ "$align_job" == "1" ]; then
     echo align with 1 job
-    /home/pkoehn/statmt/project/fast_align/build/fast_align -i $tmpfolder/pasted -d -o -v > $alignoutput.forward
-    /home/pkoehn/statmt/project/fast_align/build/fast_align -i $tmpfolder/pasted -d -o -v -r > $alignoutput.backward
-    /home/pkoehn/statmt/project/fast_align/build/atools -i $alignoutput.forward -j $alignoutput.backward -c grow-diag-final-and > $alignoutput
+    $fast_align_build/fast_align -i $tmpfolder/pasted -d -o -v > $alignoutput.forward
+    $fast_align_build/fast_align -i $tmpfolder/pasted -d -o -v -r > $alignoutput.backward
+    $fast_align_build/atools -i $alignoutput.forward -j $alignoutput.backward -c grow-diag-final-and > $alignoutput
   else
 #    shuf $tmpfolder/pasted > $tmpfolder/pasted.shuffed
     echo align with $align_job job

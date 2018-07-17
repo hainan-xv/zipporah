@@ -22,6 +22,7 @@ clean_stem_dev=/export/b03/hxu/data-selection/clean_corpus/de-en/news.de-en
 #==============================================================================
 
 aligner=fast-align
+fast_align_build=/home/pkoehn/statmt/project/fast_align/build
 align_job=1
 
 # Those 2 variables has to do with generating word dictionaries. The dictionary
@@ -29,6 +30,8 @@ align_job=1
 # simple counting method.
 dict_count_thresh=1  # Only words with counts larger than this number is considered for numerator.
 dict_total_count_thresh=1  # Only words with counts larger than this number is considered for denominator.
+
+gridengine=true
 
 #==============================================================================
 # features to use
